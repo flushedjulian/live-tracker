@@ -4,7 +4,7 @@ OBS-Browserquellen, die live anzeigen, wie viele Spieler gerade auf einem Minecr
 
 ## HugoSMP-Banner
 
-Wechselt alle paar Sekunden zwischen „Mein eigener Server · HUGOSMP.NET“ und „Join now!“ mit der Live-Spielerzahl von hugosmp.net. Im Hintergrund funkeln Sterne und fliegen Sternschnuppen.
+Wechselt alle paar Sekunden zwischen „Mein eigener Server · HUGOSMP.NET“ und „Join now!“ mit der Live-Spielerzahl von hugosmp.net. Im Hintergrund funkeln Sterne, das Logo schwebt.
 
 **URL für OBS** (Browserquelle, 1000 × 260):
 
