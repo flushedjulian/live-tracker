@@ -22,8 +22,8 @@
   @font-face {
     font-family: "Minecraft";
     font-display: block;
-    src: url("https://cdn.jsdelivr.net/npm/@south-paw/typeface-minecraft@1.0.0/files/minecraft.woff2") format("woff2"),
-         url("https://cdn.jsdelivr.net/npm/@south-paw/typeface-minecraft@1.0.0/files/minecraft.woff") format("woff");
+    /* nur woff: die woff2-Datei dieses Pakets ist kaputt und wird vom Browser verworfen */
+    src: url("https://cdn.jsdelivr.net/npm/@south-paw/typeface-minecraft@1.0.0/files/minecraft.woff") format("woff");
   }
 
   :root {
@@ -235,6 +235,7 @@
     </div>
   </div>
 
+<script src="status.js"></script>
 <script>
   const params = new URLSearchParams(location.search);
   const host = (params.get('host') || '').trim();
@@ -263,31 +264,7 @@
     logo.appendChild(s);
   }
 
-  // Zwei Status-APIs, falls eine ausfällt. Beide liefern Spielerzahl und Maximum.
-  const sources = [
-    async () => {
-      const d = await getJson(`https://api.mcstatus.io/v2/status/${edition}/${encodeURIComponent(host)}`);
-      return { online: d.online, players: d.players?.online ?? 0, max: d.players?.max ?? 0 };
-    },
-    async () => {
-      const path = edition === 'bedrock' ? 'bedrock/3' : '3';
-      const d = await getJson(`https://api.mcsrvstat.us/${path}/${encodeURIComponent(host)}`);
-      return { online: d.online, players: d.players?.online ?? 0, max: d.players?.max ?? 0 };
-    },
-  ];
-
-  async function getJson(url) {
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  }
-
-  async function fetchStatus() {
-    for (const source of sources) {
-      try { return await source(); } catch (e) { console.warn(e); }
-    }
-    throw new Error('Keine API erreichbar');
-  }
+  const fetchStatus = () => fetchMinecraftStatus(host, edition);
 
   let shown = null;    // aktuell angezeigte Zahl
   let anim = 0;

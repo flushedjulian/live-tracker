@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HugoSMP Banner</title>
+<!--
+  OBS-Browserquelle: Banner, das zwischen Server-Werbung und Live-Spielerzahl wechselt.
+
+  URL-Parameter (alle optional):
+    host=hugosmp.net            Server, dessen Spielerzahl angezeigt wird
+    edition=bedrock             für Bedrock-Server (Standard: java)
+    text=Mein eigener Server    obere Zeile der Werbung
+    server=HUGOSMP.NET          Text im lila Kasten
+    every=8                     Sekunden pro Ansicht
+    scale=0.5                   alles vergrößern/verkleinern
+
+  Empfohlene Größe der Browserquelle: 1000 × 260 (bei scale=1).
+-->
+<style>
+  @font-face {
+    font-family: "Minecraft";
+    font-display: block;
+    /* nur woff: die woff2-Datei dieses Pakets ist kaputt und wird vom Browser verworfen */
+    src: url("https://cdn.jsdelivr.net/npm/@south-paw/typeface-minecraft@1.0.0/files/minecraft.woff") format("woff");
+  }
+
+  :root {
+    --panel-1: #2d1249;
+    --panel-2: #1a0a2c;
+    --panel-border: rgba(170, 105, 255, 0.45);
+    --box-1: #9443e0;
+    --box-2: #6d22b5;
+    --box-border: #c49bff;
+    --box-shadow: #35095f;
+    --online: #55ff55;
+    --scale: 1;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: transparent; overflow: hidden; }
+  body {
+    font-family: "Minecraft", monospace;
+    color: #fff;
+    -webkit-font-smoothing: none;
+  }
+
+  .stage {
+    display: inline-block;
+    padding: 30px;
+    transform: scale(var(--scale));
+    transform-origin: top left;
+  }
+
+  /* ---------- Panel ---------- */
+  .panel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 44px;
+    padding: 26px 44px 26px 34px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, var(--panel-1) 0%, var(--panel-2) 65%, #241040 100%);
+    border: 3px solid var(--panel-border);
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.55),
+      inset 0 0 50px rgba(130, 60, 220, 0.25);
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.15; }
+    50%      { opacity: 0.9; }
+  }
+
+  /* ---------- Logo ---------- */
+  .logo {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    height: 136px;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+  }
+
+  /* ---------- Wechselnde Ansichten ---------- */
+  .slides {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    perspective: 600px;
+  }
+  .slide {
+    grid-area: 1 / 1;          /* alle Ansichten übereinander, Breite = breiteste */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .label,
+  .box {
+    transform-origin: 50% 50% -20px;
+    transition: transform 0.55s cubic-bezier(0.6, 0, 0.3, 1), opacity 0.45s;
+  }
+  .box { transition-delay: 0.12s; }
+  .slide:not(.active) .label,
+  .slide:not(.active) .box {
+    opacity: 0;
+    transform: rotateX(-90deg);
+  }
+  .slide.leaving .label,
+  .slide.leaving .box {
+    transform: rotateX(90deg);
+  }
+
+  .label {
+    font-size: 30px;
+    line-height: 1;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
+  }
+  .box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 12px 24px 14px;
+    border: 4px solid var(--box-border);
+    border-radius: 8px;
+    background: linear-gradient(180deg, var(--box-1), var(--box-2));
+    box-shadow: 0 6px 0 var(--box-shadow), 0 0 24px rgba(160, 80, 255, 0.45);
+    font-size: 58px;
+    line-height: 1;
+    letter-spacing: 3px;
+    white-space: nowrap;
+    /* Pixel-Fettschrift: Text um 3px verdoppelt, dazu Schatten */
+    text-shadow: 3px 0 0 #fff, 5px 5px 0 var(--box-shadow), 2px 5px 0 var(--box-shadow);
+  }
+  .num { font-variant-numeric: tabular-nums; }
+  .dot {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    background: var(--online);
+    border: 4px solid #000;
+    box-shadow: 0 0 14px var(--online);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="panel" id="panel">
+      <img class="logo" src="hugosmp-logo.webp" alt="HugoSMP">
+
+      <div class="slides">
+        <div class="slide active" id="ad">
+          <div class="label" id="text">Mein eigener Server</div>
+          <div class="box" id="server">HUGOSMP.NET</div>
+        </div>
+        <div class="slide" id="live">
+          <div class="label">Spieler online</div>
+          <div class="box"><span class="dot"></span><span class="num" id="num">0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="status.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  const host = (params.get('host') || 'hugosmp.net').trim();
+  const edition = params.get('edition') === 'bedrock' ? 'bedrock' : 'java';
+  const every = Math.max(3, Number(params.get('every')) || 8) * 1000;
+  const scale = Number(params.get('scale')) || 1;
+  const POLL = 60_000;   // die APIs cachen ohnehin ~1 Minute
+
+  const $ = (id) => document.getElementById(id);
+  const fmt = new Intl.NumberFormat('de-DE');
+  const num = $('num');
+
+  document.documentElement.style.setProperty('--scale', scale);
+  if (params.get('text')) $('text').textContent = params.get('text');
+  if (params.get('server')) $('server').textContent = params.get('server');
+
+  // Sterne im Hintergrund
+  const panel = $('panel');
+  for (let i = 0; i < 26; i++) {
+    const s = document.createElement('span');
+    s.className = 'star';
+    s.style.left = `${Math.random() * 100}%`;
+    s.style.top = `${Math.random() * 100}%`;
+    s.style.animationDelay = `${Math.random() * 3}s`;
+    s.style.animationDuration = `${2 + Math.random() * 3}s`;
+    panel.appendChild(s);
+  }
+
+  // ---------- Spielerzahl ----------
+  let players = null;   // letzte bekannte Zahl, null = (noch) keine Daten
+  let shown = 0;
+  let anim = 0;
+
+  function animateTo(target) {
+    const from = shown;
+    shown = target;
+    cancelAnimationFrame(anim);
+    const start = performance.now();
+    const dur = Math.min(1600, 400 + Math.abs(target - from) * 20);
+    const step = (t) => {
+      const p = Math.min(1, (t - start) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      num.textContent = fmt.format(Math.round(from + (target - from) * e));
+      if (p < 1) anim = requestAnimationFrame(step);
+    };
+    anim = requestAnimationFrame(step);
+  }
+
+  async function poll() {
+    try {
+      const s = await fetchMinecraftStatus(host, edition);
+      players = s.online ? s.players : null;
+      if (players !== null && current === live) animateTo(players);
+    } catch {
+      // letzte Zahl behalten
+    }
+  }
+
+  // ---------- Wechsel ----------
+  const ad = $('ad'), live = $('live');
+  let current = ad;
+
+  function show(next) {
+    if (next === current) return;
+    const prev = current;
+    prev.classList.remove('active');
+    prev.classList.add('leaving');
+    setTimeout(() => prev.classList.remove('leaving'), 700);
+    next.classList.add('active');
+    current = next;
+    if (next === live) {
+      // beim Einblenden von 0 hochzählen
+      shown = 0;
+      num.textContent = '0';
+      setTimeout(() => animateTo(players), 250);
+    }
+  }
+
+  setInterval(() => {
+    // ohne Spielerzahl (Server offline / API weg) bleibt die Werbung stehen
+    show(current === ad && players !== null ? live : ad);
+  }, every);
+
+  poll();
+  setInterval(poll, POLL);
+</script>
+</body>
+</html>

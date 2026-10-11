@@ -1,6 +1,26 @@
 # Live Tracker
 
-OBS-Browserquelle, die live anzeigt, wie viele Spieler gerade auf einem Minecraft-Server sind.
+OBS-Browserquellen, die live anzeigen, wie viele Spieler gerade auf einem Minecraft-Server sind.
+
+## HugoSMP-Banner
+
+Wechselt alle paar Sekunden zwischen „Mein eigener Server · HUGOSMP.NET“ und der Live-Spielerzahl von hugosmp.net.
+
+**URL für OBS** (Browserquelle, 1000 × 260):
+
+```
+https://flushedjulian.github.io/live-tracker/banner.html
+```
+
+| Parameter | Wirkung |
+|---|---|
+| `every=8` | Sekunden pro Ansicht |
+| `scale=0.5` | ganzes Banner verkleinern/vergrößern |
+| `text=Mein eigener Server` | obere Zeile der Werbung |
+| `server=HUGOSMP.NET` | Text im lila Kasten |
+| `host=hugosmp.net` | Server für die Spielerzahl |
+
+## Spielerzähler
 
 **URL für OBS** (Browserquelle, 1000 × 400):
 
