@@ -76,9 +76,40 @@
     opacity: 0.2;
     animation: twinkle 3s ease-in-out infinite;
   }
+  .star.big { box-shadow: 0 0 6px 1px rgba(214, 180, 255, 0.9); }
   @keyframes twinkle {
     0%, 100% { opacity: 0.15; }
-    50%      { opacity: 0.9; }
+    50%      { opacity: 0.95; }
+  }
+
+  /* Sternschnuppen: Kopf links, Schweif nach rechts oben, fliegen nach links unten */
+  .meteor {
+    position: absolute;
+    width: 230px;
+    height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #fff, rgba(224, 196, 255, 0.85) 20%, rgba(170, 105, 255, 0.35) 60%, transparent);
+    filter: drop-shadow(0 0 4px rgba(214, 180, 255, 0.8));
+    opacity: 0;
+    pointer-events: none;
+    animation: meteor var(--dur, 1.2s) linear forwards;
+  }
+  .meteor::before {
+    content: "";
+    position: absolute;
+    left: -3px;
+    top: -3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 14px 5px rgba(224, 196, 255, 0.95);
+  }
+  @keyframes meteor {
+    0%   { opacity: 0; transform: rotate(-24deg) translateX(0); }
+    8%   { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { opacity: 0; transform: rotate(-24deg) translateX(-700px); }
   }
 
   /* ---------- Logo ---------- */
@@ -171,7 +202,7 @@
           <div class="box" id="server">HUGOSMP.NET</div>
         </div>
         <div class="slide" id="live">
-          <div class="label">Spieler online</div>
+          <div class="label">Join now!</div>
           <div class="box"><span class="dot"></span><span class="num" id="num">0</span></div>
         </div>
       </div>
@@ -197,15 +228,30 @@
 
   // Sterne im Hintergrund
   const panel = $('panel');
-  for (let i = 0; i < 26; i++) {
+  for (let i = 0; i < 90; i++) {
     const s = document.createElement('span');
-    s.className = 'star';
+    const size = Math.random() < 0.15 ? 4 : Math.random() < 0.5 ? 2 : 3;
+    s.className = size === 4 ? 'star big' : 'star';
+    s.style.width = s.style.height = `${size}px`;
     s.style.left = `${Math.random() * 100}%`;
     s.style.top = `${Math.random() * 100}%`;
     s.style.animationDelay = `${Math.random() * 3}s`;
     s.style.animationDuration = `${2 + Math.random() * 3}s`;
     panel.appendChild(s);
   }
+
+  // Sternschnuppen in zufälligen Abständen
+  function meteor() {
+    const m = document.createElement('span');
+    m.className = 'meteor';
+    m.style.left = `${35 + Math.random() * 70}%`;
+    m.style.top = `${-10 + Math.random() * 50}%`;
+    m.style.setProperty('--dur', `${0.9 + Math.random() * 0.8}s`);
+    m.addEventListener('animationend', () => m.remove());
+    panel.appendChild(m);
+    setTimeout(meteor, 1200 + Math.random() * 2800);
+  }
+  setTimeout(meteor, 800);
 
   // ---------- Spielerzahl ----------
   let players = null;   // letzte bekannte Zahl, null = (noch) keine Daten
